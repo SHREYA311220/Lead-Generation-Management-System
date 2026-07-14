@@ -1,0 +1,22 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+  <div class="container py-4">
+    {% if messages %}
+      <div class="alert alert-success" role="alert">
+        {% for message in messages %}
+          {{ message }}
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="card bg-dark text-white rounded-4 p-4">
+      <div class="card-body">
+        <h1 class="card-title">Welcome{{ username|default:' User' }}!</h1>
+        <p class="card-text">You are now logged in. Use the navigation links to continue.</p>
+        <a href="{% url 'home' %}" class="btn btn-outline-light mt-3">Go to Home</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

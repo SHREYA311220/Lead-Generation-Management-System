@@ -1,0 +1,1055 @@
+{% extends 'dashboard/dashboard_base.html' %}
+{% block title %}Marketing Dashboard{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1.2rem;">
+  <a href="{% url 'admin_logout' %}" class="btn btn-outline-warning"
+    style="background: none; color: #FFD700; border: 1.5px solid #FFD700; border-radius: 2rem; font-weight: 600; padding: 0.4rem 1.3rem; transition: background 0.18s, color 0.18s;">
+    <i class="fa fa-sign-out-alt"></i> Logout
+  </a>
+</div>
+<div class="dashboard-header" style="color:rgb(245, 240, 212); font-weight: 1000; font-size: 2.1rem; margin-bottom: 1.5rem; letter-spacing: 1.2px; text-shadow: 1px 2px 8px rgba(76, 215, 162, 0.96);">Marketing Dashboard</div>
+<div class="kpi-cards">
+  <!-- Lead KPI Card -->
+
+   <!-- <div class="kpi-card">
+    <div class="kpi-value">{{ leads_count }}</div>
+    <div class="kpi-label">Leads Generated</div>
+  </div> -->
+  <div class="kpi-card" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#leadsListModal">
+  <div class="kpi-value">{{ leads_count }}</div>
+  <div class="kpi-label">Leads Generated</div>
+</div>
+  <!-- Leads List Modal -->
+<div class="modal fade" id="leadsListModal" tabindex="-1" aria-labelledby="leadsListModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="background: #181F2F; border-radius: 1.2rem; color: #fff;">
+      <div class="modal-header" style="border-bottom: 1px solid #10B981;">
+        <h5 class="modal-title" id="leadsListModalLabel" style="color: #FFD700; font-weight: 700;">
+          <i class="fa fa-users"></i> Leads List
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle mb-0" style="border-radius: 0.7rem; overflow: hidden;">
+            <thead style="background: #10B981;">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <!-- <th>Status</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              {% for lead in leads %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ lead.name }}</td>
+                <td>{{ lead.email }}</td>
+                <td>{{ lead.phone }}</td>
+                <!-- <td>{{ lead.status }}</td> -->
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted">No leads found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  <a href="{% url 'products' %}" class="kpi-card" style="text-decoration:none; cursor:pointer;">
+    <div class="kpi-value">{{ products_count }}</div>
+    <div class="kpi-label">Products</div>
+  </a>
+  <a href="#" class="kpi-card" style="text-decoration:none; cursor:pointer;" data-bs-toggle="modal"data-bs-target="#franchiseListModal">
+     <div class="kpi-value">{{ franchises_count }}</div>
+    <div class="kpi-label">Franchises</div>
+  </a>
+
+  <div class="kpi-card" style="cursor:pointer;" onclick="window.location.href='{% url 'coupon_list' %}'">
+    <div class="kpi-value"><i class="fa fa-ticket-alt" style="color:#FFD700;"></i></div>
+     <div class="kpi-value">{{ coupons_count }}</div>
+    <div class="kpi-label">Coupons</div>
+    <div style="font-size:12px;color:#FFD700;">View Coupons</div>
+  </div>
+
+  <!-- Franchise List Modal -->
+
+  <div class="modal fade" id="franchiseListModal" tabindex="-1" aria-labelledby="franchiseListModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="background: ; border-radius: 1.2rem; color: #fff;">
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0"
+              style="border-radius: 0.7rem; overflow: hidden;">
+              <thead style="background: #10B981;">
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Location</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for franchise in franchises %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ franchise.name }}</td>
+                  <td>{{ franchise.address }}</td>
+                  <td>{{ franchise.contact_email }}</td>
+                  <td>{{ franchise.phone_number }}</td>
+                  <td class="franchise-list-btns">
+                    <button class="btn btn-warning btn-sm" onclick="editFranchise({{ franchise.id }})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteFranchise({{ franchise.id }})">Delete</button>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center text-muted">No franchises found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- Edit Franchise Modal -->
+<div class="modal fade" id="editFranchiseModal" tabindex="-1" aria-labelledby="editFranchiseModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background:; border-radius: 1.2rem; color: #fff;">
+      <div class="modal-header" style="border-bottom: 1px solid #10B981;">
+        <h5 class="modal-title" id="editFranchiseModalLabel" style="color: #FFD700; font-weight: 700;">
+          <i class="fa fa-edit"></i> Edit Franchise
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editFranchiseForm">
+          <input type="hidden" id="editFranchiseId" name="id">
+          <div class="mb-3">
+            <label class="form-label" for="editFranchiseName">Name</label>
+            <input type="text" class="form-control" id="editFranchiseName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="editFranchiseLocation">Location</label>
+            <input type="text" class="form-control" id="editFranchiseLocation" name="address" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="editFranchiseEmail">Email</label>
+            <input type="email" class="form-control" id="editFranchiseEmail" name="contact_email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="editFranchisePhone">Phone Number</label>
+            <input type="text" class="form-control" id="editFranchisePhone" name="phone_number" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100" style="border-radius: 2rem; font-weight: 700;">Update
+            Franchise</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Staff Modal -->
+<div id="staff-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <span class="close-btn" onclick="toggleStaffModal()">&times;</span>
+    <h3 style="color:black; margin-bottom:16px;">Staff Members</h3>
+    <div class="staff-list">
+      <table style="width:100%; background:#232f3e; color:#fff; border-radius:8px;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for staff in staff_list %}
+          <tr>
+            <td>{{ staff.name }}</td>
+            <td>{{ staff.email }}</td>
+            <td>{{ staff.role }}</td>
+            <td>
+              <a href="{% url 'edit_staff' staff.id %}" class="btn btn-sm" style="color:#FFD700;"><i
+                  class="fa fa-edit"></i></a>
+              <a href="{% url 'delete_staff' staff.id %}" class="btn btn-sm" style="color:#EF4444;"
+                onclick="return confirm('Delete this staff member?');"><i class="fa fa-trash"></i></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" style="text-align:center;">No staff found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="quick-actions">
+    <!-- <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addLeadModal">
+  <i class="fa fa-plus"></i> Add Leads
+</button> -->
+    <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addLeadModal">
+ <i class="fa fa-plus"></i> Add Leads
+</button>
+<!-- Add Lead Modal -->
+<div class="modal fade" id="addLeadModal" tabindex="-1" aria-labelledby="addLeadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="
+      background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%),
+                  url('https://www.transparenttextures.com/patterns/marble.png');
+      background-blend-mode: overlay;
+      border-radius: 1.2rem;
+      color: #fff;
+    ">
+      <div class="modal-header" style="border-bottom: 1px solid #10B981;">
+        <h5 class="modal-title" id="addLeadModalLabel" style="color: #FFD700; font-weight: 700;">
+          <i class="fa fa-plus"></i> Add Leads
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'add_lead' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          {{ form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Add Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Lead (Old) Modal -->
+<div class="modal fade" id="addStaffModal" tabindex="-1" aria-labelledby="addStaffModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background: #181F2D; border-radius: 1.2rem; color: #fff;">
+      <div class="modal-header" style="border-bottom: 1px solid #FFD700;">
+        <h5 class="modal-title" id="addStaffModalLabel" style="color: #FFD700; font-weight: 700;">
+          <i class="fa fa-plus"></i>Add Lead---
+        </h5>
+        <button type="  button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="addLeadForm" method="post" action="{% url 'add_lead' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label" for="staffName">Name</label>
+            <input type="text" class="form-control" id="staffName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="staffEmail">Email</label>
+            <input type="email" class="form-control" id="staffEmail" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="staffPhone">Phone</label>
+            <input type="text" class="form-control" id="staffPhone" name="phone" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="staffLocation">Location</label>
+            <input type="text" class="form-control" id="staffLocation" name="location" required>
+          </div>
+            <div class="mb-3">
+            <label class="form-label" for="staffAddress">Address</label>
+            <input type="text" class="form-control" id="staffAddress" name="location" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success" style="border-radius: 2rem; font-weight: 700;">Add Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+   <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addFranchiseModal">
+  <i class="fa fa-plus"></i> Add Franchise
+</button>
+
+
+<!-- Add Franchise Modal -->
+<div class="modal fade" id="addFranchiseModal" tabindex="-1" aria-labelledby="addFranchiseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background: ; border-radius: 1.2rem; color: ;">
+      <div class="modal-header" style="border-bottom: 1px solid #10B981;">
+        <h5 class="modal-title" id="addFranchiseModalLabel" style="color: ; font-weight: 700;">
+          <i class="fa fa-plus"></i> Add Franchise
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addFranchiseForm" method="post" action="{% url 'add_franchise' %}" autocomplete="off">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="franchiseName">Name</label>
+            <input type="text" class="form-control" id="franchiseName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="franchiseLocation">Location</label>
+            <input type="text" class="form-control" id="franchiseLocation" name="address" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="franchiseEmail">Email</label>
+            <input type="email" class="form-control" id="franchiseEmail" name="contact_email" required>
+          </div>
+             <div class="mb-3">
+            <label class="form-label" for="id_phone_number">Phone Number</label>
+            <input type="text" name="phone_number" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">
+            <i class="fa fa-plus"></i> Add Franchise
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="dashboard-chart" style="background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%); padding: 1.5rem; border-radius: 1.2rem; margin-top: 2rem;    box-shadow: 0 4px 24px 0 rgb(16, 1, 1), 0 8px 32px 0 rgba(142,197,252,0.18);">
+<!-- Add this below your KPI cards or wherever you want the chart -->
+<div class="dashboard-chart" style="background: linear-gradient(135deg, #f7fafc 0%, #e0c3fc 50%, #8ec5fc 100%); border-radius: 1.2rem; margin-top: 2rem; box-shadow: 0 4px 24px 0 rgb(16, 1, 1), 0 8px 32px 0 rgba(142,197,252,0.18); padding: 1.5rem;">
+  <canvas id="leadsFranchiseChart"></canvas>
+</div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+
+
+
+
+<style>
+  .kpi-card .kpi-label {
+    color: #00897b;
+}
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: linear-gradient(135deg, #181F2F 0%, #232f3e 60%, #10B981 100%);
+    padding: 32px 24px 24px 24px;
+    border-radius: 12px;
+    min-width: 350px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(16,185,129,0.18);
+    position: relative;
+    animation: modalIn 0.2s;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 2rem;
+    color: #FFD700;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  @keyframes modalIn {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .staff-list table {
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .staff-list th,
+  .staff-list td {
+    padding: 10px 12px;
+    text-align: left;
+  }
+
+  .staff-list th {
+    background: linear-gradient(135deg, #10B981 0%, #232f3e 100%);
+    color: #FFD700;
+    font-weight: bold;
+  }
+  .staff-list tr:nth-child(even), .staff-list tr:nth-child(odd) {
+    background: linear-gradient(135deg, #232f3e 0%, #1e293b 100%);
+  }
+  .staff-list td {
+    color: #FFD700;
+    font-size: 0.98rem;
+  }
+
+  /* Unified KPI Card Styles (matches homepage) */
+  .kpi-cards {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.2rem;
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem;
+    box-shadow:0 4px 24px 0 rgb(16, 1, 1);
+  }
+  .kpi-card {
+    background: linear-gradient(135deg, #f7fafc 0%, #e0c3fc 50%, #8ec5fc 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+
+    border: 2.5px solid rgba(10,10,10, 0.08 );
+    border-radius: 1.2rem;
+    box-shadow: 0 4px 24px rgba(10, 10, 10, 0.08);
+    padding: 2.2rem 2.1rem 1.2rem 2.1rem;
+    min-width: 200px;
+    min-height: 70px;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.7s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  .kpi-card:hover {
+    background: linear-gradient(120deg, #ffe082 0%, #b6e2d3 60%, #e0c3fc 100%);
+    box-shadow: 0 8px 32px 0 rgba(255,165,0,0.18), 0 1.5px 8px 0 rgba(255,215,0,0.10);
+    transform: translateY(-6px) scale(1.04) rotate(-1deg);
+    z-index: 2;
+  }
+  .kpi-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color:rgb(53, 53, 52);
+    margin-bottom: 0.2rem;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(16,185,129,0.10);
+  }
+  /* .kpi-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: 0.5px;
+    opacity: 0.92;
+  } */
+   .kpi-label {
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+  /* Sidebar and General Text Colors */
+  .sidebar, .activity-title, .activity-list, .quick-actions, .modal-content, .staff-list th, .staff-list td, .btn, .modal-header, .modal-title, .close-btn {
+     background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+
+    font-size: 0.98rem;
+    letter-spacing: 0.5px;
+  }
+  .sidebar {
+    box-shadow:;
+    border-right: 2px solid #10B981;
+  }
+  .sidebar a, .sidebar .nav-link {
+    color:rgb(247, 246, 243) !important;
+    font-size: 0.98rem;
+    transition: color 0.3s, background 0.3s;
+  }
+  .sidebar a:hover, .sidebar .nav-link:hover {
+    color:rgb(5, 5, 5) !important;
+    background: ;
+    border-radius: 0.7rem;
+  }
+  .dashboard-header {
+    color: #FFD700;
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1.2px;
+    text-shadow: 0 2px 8px rgba(16,185,129,0.10);
+  }
+  .activity-feed {
+     background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+margin-bottom: 2.2rem;
+  border-radius: 1.2rem;
+  padding:1.2rem 1.5rem;
+  box-shadow: 0 4px 24px 0 rgb(16, 1, 1), 0 8px 32px 0 rgba(6, 6, 6, 0.18); /* Added extra box shadow for more depth */
+  align-items: center;
+  justify-content: flex-start;
+  
+    
+  }
+  .activity-title {
+    color: #10B981;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+  }
+  .activity-item {
+    color:rgb(9, 9, 9);
+    font-size: 0.98rem;
+    margin-bottom: 0.3rem;
+  }
+  .quick-actions {
+     background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+    display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.2rem;
+  border-radius: 1.5rem;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 4px 24px 0 rgb(16, 1, 1), 0 8px 32px 0 rgba(6, 6, 6, 0.18); /* Added extra box shadow for more depth */
+  align-items: center;
+  justify-content: flex-start;
+  }
+  .quick-action-btn {
+     background: #fff;
+    color: #0d47a1;
+    border: 1.5px solid #e0c3fc;
+    border-radius: 2rem;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+      box-shadow:0 4px 24px 0 rgb(16, 1, 1)
+;
+  }
+  .quick-action-btn:hover {
+       background:rgb(243, 153, 153);
+    color:rgb(17, 18, 18);
+    box-shadow: 0 4px 16px 0 rgba(142,197,252,0.18);
+  }
+  .modal-content {
+     background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+
+    color: #fff;
+    border-radius: 1.2rem;
+    box-shadow: 0 8px 32px rgba(16,185,129,0.10);
+  }
+  .modal-header {
+    border-bottom: 1px solid #10B981;
+    background: transparent;
+  }
+  .modal-title {
+    color: #FFD700;
+    font-weight: 700;
+  }
+  .close-btn {
+    color: #FFD700;
+  }
+  .staff-list th {
+     background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+
+    color: #FFD700;
+    font-weight: bold;
+  }
+  .staff-list tr:nth-child(even), .staff-list tr:nth-child(odd) {
+    background: linear-gradient(135deg, #232f3e 0%, #1e293b 100%);
+  }
+  .staff-list td {
+    color: #FFD700;
+    font-size: 0.98rem;
+  }
+
+  .table-dark {
+         background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+
+    color: #FFD700;
+  }
+  .table-dark th {
+         background: linear-gradient(135deg, rgb(194, 224, 128) 0%, rgb(230, 128, 112) 30%, rgb(164, 117, 173) 60%, rgb(155, 228, 161) 100%), url('https://www.transparenttextures.com/patterns/marble.png');
+
+    color: #fff;
+  }
+  .btn-warning {
+    background: #FFD700;
+    color: #232f3e;
+    border: none;
+    font-weight: 600;
+    border-radius: 0.7rem;
+    transition: background 0.3s, color 0.3s;
+  }
+  .btn-warning:hover {
+    background:rgb(35, 40, 38);
+    color: #fff;
+  }
+  .btn-danger {
+    background: #EF4444;
+    color: #fff;
+    border: none;
+    border-radius: 0.7rem;
+    font-weight: 600;
+    transition: background 0.3s, color 0.3s;
+  }
+  .btn-danger:hover {
+    background: #232f3e;
+    color: #FFD700;
+  }
+  .franchise-list-btns .btn-warning {
+  background: #FFD700;
+  color: #232f3e;
+  border: none;
+  font-weight: 600;
+  border-radius: 0.7rem;
+  transition: background 0.3s, color 0.3s;
+}
+.franchise-list-btns .btn-warning:hover {
+  background: #10B981;
+  color: #fff;
+}
+.franchise-list-btns .btn-danger {
+  background: #EF4444;
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  font-weight: 600;
+  transition: background 0.3s, color 0.3s;
+}
+.franchise-list-btns .btn-danger:hover {
+  background: #232f3e;
+  color: #FFD700;
+}
+  /* ...existing code... */
+</style>
+<style>
+  .modal-content .table {
+    border-radius: 0.7rem;
+    overflow: hidden;
+  }
+  .modal-content .table thead {
+    background: #10B981;
+    color: #181F2F;
+    font-weight: 700;
+  }
+  .modal-content .table tbody tr {
+    transition: background 0.2s;
+  }
+  .modal-content .table tbody tr:hover {
+    background: #134e4a !important;
+  }
+  
+  
+
+</style>
+<script>
+    // ...existing code...
+
+// Bar/Line chart for Leads vs Franchises
+const ctxLF = document.getElementById('leadsFranchiseChart').getContext('2d');
+new Chart(ctxLF, {
+  type: 'bar', // Change to 'line' for a line chart
+  data: {
+    labels: ['Leads', 'Franchises'],
+    datasets: [{
+      label: 'Count',
+      data: [{{ leads_count }}, {{ franchises_count }}],
+      backgroundColor: [
+        'rgba(255, 215, 0, 0.7)',
+        'rgba(16, 185, 129, 0.7)'
+      ],
+      borderColor: [
+        '#FFD700',
+        '#10B981'
+      ],
+      borderWidth: 2
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1E293B',
+        titleColor: '#FFD700',
+        bodyColor: '#fff',
+        borderColor: '#10B981',
+        borderWidth: 1
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(255,255,255,0.08)' },
+        ticks: { color: '#fff', font: { weight: 'bold' } }
+      },
+      x: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: '#FFD700', font: { weight: 'bold' } }
+      }
+    }
+  }
+});
+
+// ...existing code...
+  function editFranchise(id) {
+    // Find the franchise data in the table row
+    const row = document.querySelector(`button[onclick="editFranchise(${id})"]`).closest('tr');
+    const name = row.children[1].textContent.trim();
+    const address = row.children[2].textContent.trim();
+    const contact_email = row.children[3].textContent.trim();
+    const phone_number = row.children[4].textContent.trim();
+
+    // Fill the modal form
+    document.getElementById('editFranchiseId').value = id;
+    document.getElementById('editFranchiseName').value = name;
+    document.getElementById('editFranchiseLocation').value = address;
+    document.getElementById('editFranchiseEmail').value = contact_email;
+    document.getElementById('editFranchisePhone').value = phone_number;
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('editFranchiseModal'));
+    modal.show();
+  }
+
+  // Handle Edit Franchise form submit
+  const editFranchiseForm = document.getElementById('editFranchiseForm');
+  editFranchiseForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const id = document.getElementById('editFranchiseId').value;
+    const name = document.getElementById('editFranchiseName').value;
+    const address = document.getElementById('editFranchiseLocation').value;
+    const contact_email = document.getElementById('editFranchiseEmail').value;
+    const phone_number = document.getElementById('editFranchisePhone').value;
+
+    fetch(`/update-franchise/${id}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: `name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&contact_email=${encodeURIComponent(contact_email)}&phone_number=${encodeURIComponent(phone_number)}`
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showCouponToast('✅ Franchise updated successfully!');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editFranchiseModal'));
+          if (modal) modal.hide();
+          setTimeout(() => location.reload(), 1200);
+        } else {
+          showCouponToast('❌ Failed to update franchise.');
+        }
+      })
+      .catch(() => showCouponToast('❌ Error updating franchise.'));
+  });
+
+
+  function deleteFranchise(id) {
+    if (confirm('Are you sure you want to delete this franchise?')) {
+      fetch(`/delete-franchise/${id}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Failed to delete franchise.');
+          }
+        });
+    }
+  }
+
+
+  // ...existing code...
+
+  function openEditFranchiseModal(id, name, address, area, email) {
+    document.getElementById('editFranchiseId').value = id;
+    document.getElementById('editFranchiseName').value = name;
+    document.getElementById('editFranchiseAddress').value = address;
+    document.getElementById('editFranchiseArea').value = area;
+    document.getElementById('editFranchiseEmail').value = email;
+    var modal = new bootstrap.Modal(document.getElementById('editFranchiseModal'));
+    modal.show();
+  }
+
+  document.getElementById('editFranchiseForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const id = document.getElementById('editFranchiseId').value;
+    const name = document.getElementById('editFranchiseName').value;
+    const address = document.getElementById('editFranchiseAddress').value;
+    const area = document.getElementById('editFranchiseArea').value;
+    const contact_email = document.getElementById('editFranchiseEmail').value;
+    fetch(`/franchise/${id}/edit/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ name, address, area, contact_email })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showCouponToast('✅ Franchise updated!');
+          location.reload();
+        } else {
+          showCouponToast('❌ Update failed.');
+        }
+      });
+  });
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.onclick = function () {
+      fetch(`/franchise/${deleteFranchiseId}/delete/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showCouponToast('✅ Franchise deleted!');
+            location.reload();
+          } else {
+            showCouponToast('❌ Delete failed.');
+          }
+        });
+  }
+  // Delete
+  let deleteFranchiseId = null;
+  function confirmDeleteFranchise(id) {
+    deleteFranchiseId = id;
+    var modal = new bootstrap.Modal(document.getElementById('deleteFranchiseModal'));
+    modal.show();
+  }
+
+  // Simple toast function
+  function showCouponToast(message) {
+    let toast = document.createElement('div');
+    toast.innerText = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '30px';
+    toast.style.right = '30px';
+    toast.style.background = '#232f3e';
+    toast.style.color = '#FFD700';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '8px';
+    toast.style.fontWeight = 'bold';
+    toast.style.zIndex = 9999;
+    toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.2)';
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, 2500);
+  }
+
+  // Optional: AJAX submit for add staff form
+
+  // ...existing code...
+
+  const addLeadForm = document.getElementById('addLeadForm');
+
+addLeadForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const name = document.getElementById('leadName').value;
+  const email = document.getElementById('leadEmail').value;
+  const phone = document.getElementById('leadPhone').value;
+  const location = document.getElementById('leadLocation').value;
+
+  fetch('/add-lead/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': '{{ csrf_token }}'  // Ensure Django template context includes this
+    },
+    body: `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&location=${encodeURIComponent(location)}`
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showCouponToast('✅ Lead added successfully!');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addLeadModal'));
+        if (modal) modal.hide();
+        addLeadForm.reset();
+        setTimeout(() => location.reload(), 1200);
+      } else {
+        showCouponToast('❌ Failed to add lead.');
+        console.error(data.errors);
+      }
+    })
+    .catch(() => showCouponToast('❌ Error adding lead.'));
+});
+
+  // Add Franchise AJAX (robust error handling)
+const addFranchiseForm = document.getElementById('addFranchiseForm');
+addFranchiseForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('franchiseName').value;
+  const address = document.getElementById('franchiseLocation').value;
+  const contact_email = document.getElementById('franchiseEmail').value;
+  const phone_number = document.querySelector('input[name="phone_number"]').value;
+  fetch('/add-franchise/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: `name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&contact_email=${encodeURIComponent(contact_email)}&phone_number=${encodeURIComponent(phone_number)}`
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success) {
+      showCouponToast('✅ Franchise added successfully!');
+      const modal = bootstrap.Modal.getInstance(document.getElementById('addFranchiseModal'));
+      if(modal) modal.hide();
+      addFranchiseForm.reset();
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      showCouponToast('❌ Failed to add franchise.');
+    }
+  })
+  .catch(() => showCouponToast('❌ Error adding franchise.'));
+});
+
+
+  // ...existing code...
+
+  function toggleStaffModal() {
+    var overlay = document.getElementById('staff-modal-overlay');
+    overlay.style.display = (overlay.style.display === 'none' || overlay.style.display === '') ? 'flex' : 'none';
+  }
+
+  function toggleStaffList() {
+    var section = document.getElementById('staff-list-section');
+    section.style.display = (section.style.display === 'none' || section.style.display === '') ? 'block' : 'none';
+  }
+
+
+  // Coupons List Modal
+  const couponListModal = document.getElementById('couponListModal');
+  if (couponListModal) {
+    couponListModal.addEventListener('show.bs.modal', function () {
+      // Fetch and display coupons data
+      fetch('/get-coupons/')
+        .then(res => res.json())
+        .then(data => {
+          const tbody = couponListModal.querySelector('table tbody');
+          tbody.innerHTML = '';
+          data.coupons.forEach((coupon, index) => {
+            const row = `<tr>
+              <td>${index + 1}</td>
+              <td>${coupon.code}</td>
+              <td>${coupon.discount_percentage}</td>
+              <td>${coupon.status}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="editCoupon(${coupon.id}, '${coupon.code}', ${coupon.discount_percentage}, '${coupon.status}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCoupon(${coupon.id})">Delete</button>
+              </td>
+            </tr>`;
+            tbody.insertAdjacentHTML('beforeend', row);
+          });
+        });
+    });
+  }
+
+  // Edit Coupon
+  function editCoupon(id, code, discount, status) {
+    document.getElementById('editCouponId').value = id;
+    document.getElementById('editCouponCode').value = code;
+    document.getElementById('editCouponDiscount').value = discount;
+    document.getElementById('editCouponStatus').value = status;
+    const modal = new bootstrap.Modal(document.getElementById('editCouponModal'));
+    modal.show();
+  }
+
+  const editCouponForm = document.getElementById('editCouponForm');
+  if (editCouponForm) {
+    editCouponForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('editCouponId').value;
+      const code = document.getElementById('editCouponCode').value;
+      const discount = document.getElementById('editCouponDiscount').value;
+      const status = document.getElementById('editCouponStatus').value;
+      fetch(`/update-coupon/${id}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `code=${encodeURIComponent(code)}&discount_percentage=${encodeURIComponent(discount)}&status=${encodeURIComponent(status)}`
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showCouponToast('✅ Coupon updated successfully!');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editCouponModal'));
+          if (modal) modal.hide();
+          setTimeout(() => location.reload(), 1200);
+        } else {
+          showCouponToast('❌ Failed to update coupon.');
+        }
+      })
+      .catch(() => showCouponToast('❌ Error updating coupon.'));
+    });
+  }
+
+  function deleteCoupon(id) {
+    if (confirm('Are you sure you want to delete this coupon?')) {
+      fetch(`/delete-coupon/${id}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showCouponToast('✅ Coupon deleted successfully!');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showCouponToast('❌ Failed to delete coupon.');
+        }
+      })
+      .catch(() => showCouponToast('❌ Error deleting coupon.'));
+    }
+  }
+}
+
+
+</script>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap JS Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}
