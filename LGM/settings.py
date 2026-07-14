@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '15s%-i*vvg4l*dwbk@rm((5spl@eo=2ze1=7p
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host.strip()]
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.vercel.app').split(',') if host.strip()]
 
 
 MEDIA_URL = '/media/'
